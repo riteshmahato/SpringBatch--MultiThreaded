@@ -12,6 +12,6 @@ All suggestions to make this a better example are welcome.
 2. Let Maven download all the dependencies and Jars from "pom.xml" in the project.
 3. Open src/main/java/SpringBatchJob.xml and set the url for JobRepository and dataSource as per your requirement.
 4. Set the no of threads in the task executor bean and set the throttle limit (default : i've set it to 6).
-5. Change the sql statements as needed (it has been set to read from a local mysql db,table:'circle'(ID,NAME).
+5. Change the sql statements as needed (it has been set to read from a local mysql db, table:'circle'(ID number,NAME varchar).
 6. Change the PSSetter to set your required prepared statement as per your writer sql query.
 7. Build project and run "App.java"
