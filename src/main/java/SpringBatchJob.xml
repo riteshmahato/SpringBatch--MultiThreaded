@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
+
+	<batch:job id="importProducts">
+		<batch:step id="readWriteProducts" >
+			<batch:tasklet task-executor="taskExecutor" throttle-limit="6">
+			
+				<batch:chunk reader="itemReader" processor="circleProcessor" writer="DBBatchWriter" commit-interval="50" />
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+	 
+	<bean id="itemReader" class="com.ritesh.SpringBatch.SimpleJob.SynchronisedReader" scope="step">
+   		 <property name="delegate" ref="readerDelegate"/>
+	</bean>
+
+	<bean id="readerDelegate" class="org.springframework.batch.item.database.JdbcCursorItemReader" scope="step">
+   		 <property name="dataSource" ref="dataSource"/>
+    	 <property name="sql" value="select * from CIRCLE"/>
+    	 <property name="rowMapper">
+      		  <bean class="com.ritesh.SpringBatch.SimpleJob.ReaderRowMapper"/>
+   		 </property>
+	</bean>
+	
+	<bean id="circleProcessor" class="com.ritesh.SpringBatch.SimpleJob.Processor" >
+		
+	</bean>
+	<bean id="dataSource"
+       class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+    <property name="url" value="jdbc:mysql://localhost:3306/db" />
+    <property name="username" value="root"/>
+    <property name="password" value=""/>
+	</bean>
+	
+	
+	<bean id="DBBatchWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+		<property name="dataSource" ref="dataSource" />
+		<property name="assertUpdates" value="true" />
+		<property name="itemPreparedStatementSetter">
+			<bean class="com.ritesh.SpringBatch.SimpleJob.PSSetter"/>
+		</property>
+		<property name="sql" value="insert into circle values(?,?)" />
+	</bean>
+	
+	<bean class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSource"/>
+	</bean>
+		
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<bean id="repoTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="repoDataSource"></property>
+	</bean>
+	
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+		<property name="dataSource" ref="repoDataSource" />
+		<property name="transactionManager" ref="repoTransactionManager" />
+		<property name="databaseType" value="mysql" />
+   </bean>
+	
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository"></property>
+	</bean>
+	
+	<bean id="repoDataSource"
+       class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+    <property name="url" value="jdbc:mysql://localhost:3306/db"/>
+    <property name="username" value="root"/>
+    <property name="password" value=""/>
+	</bean>
+	
+<!-- 	use the following lines to initialize job repository only once.After that comment them. -->
+<!--  	<jdbc:initialize-database data-source="repoDataSource"> -->
+<!-- 		<jdbc:script location="org/springframework/batch/core/schema-drop-mysql.sql" /> -->
+<!-- 		<jdbc:script location="org/springframework/batch/core/schema-mysql.sql" /> -->
+<!--   	</jdbc:initialize-database>   -->
+	
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+	  <property name="corePoolSize" value="6"/>
+	  <property name="maxPoolSize" value="6"/>
+	</bean>	
+</beans>
