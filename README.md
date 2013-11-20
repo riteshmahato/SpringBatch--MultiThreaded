@@ -8,8 +8,8 @@ All suggestions to make this a better example are welcome.
 
 ##How to Run
 
-1. Import the files in Eclipse as an "Existing Maven project".It will find the popm.xml file and set all dependencies.
-2. Let Maven download all the dependencies and Jars.
+1. Import the files in Eclipse as an "Existing Maven project".
+2. Let Maven download all the dependencies and Jars from "pom.xml" in the project.
 3. Open src/main/java/SpringBatchJob.xml and set the url for Job repository and data source to your requirement.
 4. Set the no of threads in the task executor bean and set the throttle limit (default : i've set it to 6).
 5. Change the sql statements to your requirement (it has been set to read from a local mysql db table 'circle' (ID,NAME).
