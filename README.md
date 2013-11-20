@@ -15,3 +15,14 @@ All suggestions to make this a better example are welcome.
 5. Change the sql statements as needed (it has been set to read from a local mysql db, table:'circle'(ID number,NAME varchar).
 6. Change the PSSetter to set your required prepared statement as per your writer sql query.
 7. Build project and run "App.java"
+
+###NOTE
+In "SpringBatchJob.xml", uncomment the lines 
+```html
+<jdbc:initialize-database data-source="repoDataSource"> 
+		<jdbc:script location="org/springframework/batch/core/schema-drop-mysql.sql" /> 
+		<jdbc:script location="org/springframework/batch/core/schema-mysql.sql" /> 
+  	</jdbc:initialize-database>   
+```
+
+for the "first run only". Then comment the lines for all subsequent runs. It is for initializing the job repository.
