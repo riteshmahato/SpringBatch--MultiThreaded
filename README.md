@@ -14,7 +14,7 @@ All suggestions to make this a better example are welcome.
 4. Set the no of threads in the task executor bean and set the throttle limit (default : i've set it to 6).
 5. Either modify the sql statements as per need or use the sqldum file "db_dum.sql" in the repository and restore it to get the database and tables I used.
 	```
-		restore:# mysql -u root -p[root_password] test < db_dump.sql
+		restore:# mysql -u root -p[root_password] db < db_dump.sql
 	```
 6. Change the sql statements as needed (it has been set to read from a local mysql db, table:'circle'(ID number,NAME varchar).
 7. Change the PSSetter to set your required prepared statement as per your writer sql query.
